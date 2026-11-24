@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>Lab 5 · 给「慢」下一个能算的定义</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 16mm 16mm; }
+  body { font-family: "Microsoft YaHei", "Segoe UI", sans-serif; color:#231a12;
+         line-height:1.75; font-size:10.5pt; margin:0; }
+  h1 { font-size:19pt; line-height:1.35; margin:0 0 4px; }
+  h2 { font-size:13.5pt; margin:26px 0 8px; padding-bottom:4px;
+       border-bottom:1.4px solid #d9a24a; }
+  h3 { font-size:11.5pt; margin:16px 0 4px; color:#6b5429; }
+  .sub { color:#7a6a55; font-size:9.5pt; margin-bottom:18px; }
+  .lead { background:#faf5ea; border-left:3px solid #d9a24a; padding:10px 14px; margin:14px 0; }
+  table { border-collapse:collapse; width:100%; font-size:9pt; margin:10px 0 14px; }
+  th, td { border:1px solid #ddd2bd; padding:5px 7px; text-align:left; vertical-align:top; }
+  th { background:#f3ead8; font-weight:600; }
+  td.num { text-align:right; font-variant-numeric: tabular-nums; }
+  figure { margin:14px 0 18px; page-break-inside:avoid; }
+  img { width:100%; border:1px solid #e8dfcd; }
+  figcaption { font-size:8.5pt; color:#7a6a55; margin-top:5px; }
+  .fact { color:#1f4e3d; font-weight:600; }
+  .opinion { color:#8a3b2e; }
+  code { background:#f4efe4; padding:1px 4px; border-radius:3px; font-size:8.8pt;
+         font-family: Consolas, monospace; }
+  ul, ol { margin:6px 0 10px; padding-left:22px; }
+  li { margin:3px 0; }
+  .pagebreak { page-break-before: always; }
+  .small { font-size:9pt; color:#5c5040; }
+  .kpi { display:flex; gap:10px; margin:12px 0 6px; }
+  .kpi div { flex:1; border:1px solid #e2d6bd; border-radius:6px; padding:8px 10px; background:#fcf8f0; }
+  .kpi b { display:block; font-size:15pt; color:#8a6a2c; line-height:1.2; }
+  .kpi span { font-size:8.5pt; color:#7a6a55; }
+</style>
+</head>
+<body>
+
+<h1>Lab 5：给「慢」下一个能算的定义</h1>
+<div class="sub">
+统计方法与机器学习（2026 秋）· Design Metrics for “Slow Science”<br>
+样本：《学生“慢”科研联合声明》签署者 120 人 · 数据快照 2026-11-11 · 数据源 OpenAlex API + https://gaplab.cuhk.edu.cn/slow_research/
+</div>
+
+<div class="lead">
+<b>一句话结论：</b>在这 109 位可用的签署者身上，「慢」不能靠“发得少”来度量——他们中位产出是 <b>154 篇</b>、
+近五年中位 <b>18.2 篇/年</b>，全样本里年均低于 5 篇的只有 9 人。真正有区分度的是
+<b>注意力落在哪里、落多久</b>：相邻年份的研究主题只有 37% 重叠，而最专注的那 23 个人
+（高稳定 + 低速度）和最快的 32 个人（高稳定 + 高速度）几乎一样多。
+「慢」是一种形态，不是一个刻度。
+</div>
+
+<h2>1 任务与数据</h2>
+<p>任务：给“慢”下一个<b>能计算</b>的定义，再去量这批签署者到底有多慢。</p>
+<p>数据链路是可追溯的三步，每一步都留了中间文件：</p>
+<table>
+<tr><th style="width:22%">环节</th><th style="width:30%">数据</th><th>说明</th></tr>
+<tr><td>① 名单</td><td>120 人（中英双语两表交叉核对）</td><td>页面原始表格 <code>signatories_raw.json</code></td></tr>
+<tr><td>② 身份消歧</td><td>117 / 120 匹配到 OpenAlex 作者 ID</td><td>按姓名 + 单位 + 研究方向三路比对；3 人未解决（见附录）</td></tr>
+<tr><td>③ 作品</td><td>33,347 条记录</td><td>OpenAlex works，逐作者分文件存 <code>works/*.json</code>，字段含标题、日期、主题、合作者、被引</td></tr>
+</table>
+
+<h2>2 清洗：先把不是「一个人」的东西挑出去</h2>
+<p>OpenAlex 的作者 ID 会犯错，而且错得很张扬。三个必须在报告里说清楚的动作：</p>
+
+<h3>2.1 同名合并（最严重）</h3>
+<p><code>Yue Wang</code> 名下 5,652 篇、跨度 1991–2026；<code>Min Yang</code> 2,743 篇。
+这不可能是一个人——这是同名不同人被并成一个 ID。类似的还有 <code>Dong Du</code>（团队规模中位数 100 人）
+和 <code>Yao Mu</code>。判断规则写死在代码里：<b>总量 &gt; 1500 篇或年均 &gt; 40 篇 → 标记</b>。</p>
+<p class="small">附带说明：<code>Dong Du</code> 这类未必是错误。高能物理/大型实验的合著者一年署名上百篇是常态——
+这恰好证明“篇数”这个尺子在跨领域比较时会直接失效。所以不是“删掉异常”，而是“标记 + 不参与汇总”。</p>
+
+<h3>2.2 版本重复</h3>
+<p>同一篇论文的预印本、会议版、期刊版在 OpenAlex 里是不同记录。按<b>归一化标题</b>（小写、去标点、合并空格）在作者内部去重，
+保留最早日期：33,347 → 32,652 条。</p>
+
+<h3>2.3 起始年异常与碎片 ID</h3>
+<p><code>Yang Yu</code> 最早记录 1900 年、跨度 126 年，明显是脏数据；<code>Yuchao Dai</code>、<code>Yao Yao</code>
+的起始年早于其学术生涯；<code>Minghan Li</code> 只匹配到 1 篇（账号未合并）。同样标记剔除。</p>
+
+<table>
+<tr><th>阶段</th><th class="num">作者数</th><th class="num">作品数</th></tr>
+<tr><td>签署名单</td><td class="num">120</td><td class="num">—</td></tr>
+<tr><td>消歧成功</td><td class="num">117</td><td class="num">33,347</td></tr>
+<tr><td>标题去重后</td><td class="num">117</td><td class="num">32,652</td></tr>
+<tr><td><b>进入指标计算</b></td><td class="num"><b>109</b></td><td class="num"><b>22,108</b></td></tr>
+</table>
+
+<h2>3 指标设计：为什么不合成一个分数</h2>
+<p>我先试过最直观的那个——<b>篇间隔中位数</b>。结果它给出 0.03 年（约 11 天）。不是算错了，是它测的东西不对：
+一个人一年发 20 篇，间隔当然以天计。<b>间隔衡量的是密度，不是深度。</b>所以放弃。</p>
+<p>换成四个维度，每个都给选择理由和“它会怎么骗人”：</p>
+
+<table>
+<tr><th style="width:16%">维度</th><th style="width:26%">口径</th><th>选择理由 / 它怎么骗人</th></tr>
+<tr>
+<td><b>A 速度</b><br>速度</td>
+<td>近五年（2021-11-11 至快照日）年均篇数</td>
+<td>直观、易核。骗人之处：跨领域不可比（高能物理 vs 单篇长周期人文计算）；2026 年只到 11 月，但用“近五年窗口 ÷ 5”已摊平。</td>
+</tr>
+<tr>
+<td><b>B 专注</b><br>专注度</td>
+<td>相邻两个有产出的年份，各自 top3 研究主题集合的 Jaccard 相似度，取均值</td>
+<td>这是本实验的核心假设：<b>“慢”的语义更接近“长期啃同一个问题”</b>，而不是“产出少”。骗人之处：OpenAlex 主题是按论文自动打的三级标签，噪声大；一个人换到邻近子领域会被算成“换赛道”。</td>
+</tr>
+<tr>
+<td><b>C 团队</b><br>团队规模</td>
+<td>每篇合作者人数（含本人）的中位数；独作占比</td>
+<td>小团队/独作意味着更长的人均投入。骗人之处：学科惯例差异极大，CS 会议常态 5–7 人，不代表谁快。</td>
+</tr>
+<tr>
+<td><b>D 节奏</b><br>空窗与波动</td>
+<td>活跃区间内最长连续无产出年数；逐年篇数的变异系数 CV</td>
+<td>“养一个长项目”会在年粒度上留下空窗；CV 低表示匀速、CV 高表示冲刺。骗人之处：空窗也可能是离开学术、生病、转岗。</td>
+</tr>
+</table>
+
+<p><b>为什么不加权成一个「慢度指数」？</b>因为权重是任意的。把“专注”乘 0.4、“速度”乘 −0.3，
+排名会随这两个数字变，而这两个数字没有任何外部依据。所以我保留四维，主图用<b>二维象限</b>呈现——
+它不假装自己知道各维度该占多少权重，只告诉你每个人<b>落在哪个角落</b>。</p>
+
+<h2 class="pagebreak">4 结果</h2>
+
+<div class="kpi">
+  <div><b>154</b><span>人均论文数（中位）</span></div>
+  <div><b>18.2</b><span>近五年篇/年（中位）</span></div>
+  <div><b>0.37</b><span>主题稳定度（中位）</span></div>
+  <div><b>6</b><span>每篇合作者（中位）</span></div>
+  <div><b>19.1</b><span>学术跨度·年（中位）</span></div>
+</div>
+
+<figure>
+  <img src="fig1_dist.png" alt="近五年年均产出分布">
+  <figcaption>图 1　109 位签署者近五年年均产出。中位 18.2 篇/年；四分位区间 11.0–28.0；最高 70.8。
+  低于 5 篇/年的只有 9 人。</figcaption>
+</figure>
+
+<figure>
+  <img src="fig2_quadrant.png" alt="专注 × 速度 四象限">
+  <figcaption>图 2　主图。横轴速度、纵轴专注度，虚线为两者中位数。右上「深耕快产」32 人，
+  右下「广撒快产」23 人，左上「深耕慢产」23 人，左下「广撒慢产」31 人。
+  被标注的是稳定度最高的几个人（Xiaoxiao Long 0.78、Anpei Chen 0.65、Boyu Zhou 0.63）。</figcaption>
+</figure>
+
+<figure>
+  <img src="fig3_yearly.png" alt="年度产出总和">
+  <figcaption>图 3　113 人（清洗前全样本）的年度产出总和。2015 年后加速明显；
+  2026 年仅覆盖到 11 月 11 日，不应与前几年直接比较。</figcaption>
+</figure>
+
+<figure>
+  <img src="fig4_team.png" alt="团队规模分布">
+  <figcaption>图 4　每篇合作者人数的中位数。中位 6 人，独作占比中位仅 1%——
+  这批签署者里几乎没有人靠独作产出。</figcaption>
+</figure>
+
+<figure>
+  <img src="fig5_gap.png" alt="最长空窗分布">
+  <figcaption>图 5　活跃区间内最长连续无产出年数。中位 1 年，P90 为 7 年；
+  只有极少数人真正“停过”。</figcaption>
+</figure>
+
+<h2 class="pagebreak">5 三个反直觉的发现</h2>
+
+<h3>5.1 产出少的人，并不更专注</h3>
+<p><span class="fact">数据事实：</span>近五年年均低于 5 篇/年的 9 个人，主题稳定度中位数是 <b>0.167</b>；
+而年均 30 篇以上的 26 个人，稳定度中位数是 <b>0.392</b>。低产者的被引中位数也更低（6 vs 13）。</p>
+<p><span class="opinion">我的解读：</span>如果“慢 = 少而深”，这条曲线应该是反的。它没有。
+更可能的解释是：<b>低产往往是“离开了”而不是“沉下去了”</b>——转岗、换方向、进工业界，产出和主题连续性一起掉。
+换句话说，用“发文少”识别“慢科研”，抓到的多半是别的东西。</p>
+
+<h3>5.2 「专注」和「高产」不冲突</h3>
+<p><span class="fact">数据事实：</span>稳定度最高的 28 人（≥0.5）近五年年均中位数 <b>19.6</b> 篇，
+和整体中位数 18.2 几乎一样；<code>Wanxiang Che</code> 稳定度 0.76、年均 34.6 篇，同时站在两个维度的右上方。</p>
+<p><span class="opinion">我的解读：</span>这削弱了“慢 = 慢发”的直觉，支持另一种定义：
+慢科研更像<b>在一个方向上反复深挖，而不是换赛道</b>。深度和频率可以是独立的两个轴。</p>
+
+<h3>5.3 结论不是被少数极端值撑起来的</h3>
+<p><span class="fact">数据事实：</span>剔除产出最高的 5 / 10 / 20 人后，近五年年均中位数分别是
+<b>17.6 / 17.2 / 15.0</b> 篇/年，总篇数中位数 150 / 141 / 127，稳定度中位数 0.378 / 0.383 / 0.364。
+数值缓慢下滑，<b>结论方向不变</b>。</p>
+<p class="small">这条为什么值得单独写：作者消歧的错误几乎总是“多并少”，也就是把产出往上抬。
+如果结论只在含极端值的样本里成立，那它其实是消歧误差造出来的。</p>
+
+<h2>6 这个实验不能回答什么</h2>
+<ol>
+<li><b>因果。</b>是签了声明才变慢，还是本来就慢的人更愿意签？本实验的两个变量都是同一时点的截面，
+回答不了方向。要回答它需要签署前后的面板数据，以及一个可比的对照组。</li>
+<li><b>“慢”是不是好事。</b>本研究只描述形态，不评价价值。高产<em>不等于</em>浮躁，低产<em>不等于</em>深刻。</li>
+<li><b>领域可比性。</b>样本以 CS/AI 为主，但内部仍有巨大差异（高能物理的大团队 vs 单篇长周期方向）。
+我做了标记而没有做领域归一，因为给 109 个人分工种本身就要求另一层判断。</li>
+<li><b>身份的完整性。</b>117/120 是消歧结果，不是真值。3 人未解决、1 人碎片 ID、
+若干人仍可能残留合并误差。所有个体结论都应视为“在这个数据版本下成立”。</li>
+<li><b>2026 年不满一年。</b>凡涉及 2026 的绝对篇数都偏低，本文一律用“近五年年均”代替年度比较。</li>
+</ol>
+
+<h2>7 附录</h2>
+<h3>7.1 被剔除的 8 人</h3>
+<table>
+<tr><th>姓名</th><th>标记</th><th>依据</th></tr>
+<tr><td>Yue Wang</td><td>疑似身份合并</td><td>5,652 篇 / 1991–2026</td></tr>
+<tr><td>Min Yang</td><td>疑似身份合并</td><td>2,743 篇 / 年均 68.8</td></tr>
+<tr><td>Dong Du</td><td>疑似身份合并</td><td>年均 55.8，团队中位 100 人（可能为大科学装置合著）</td></tr>
+<tr><td>Yao Mu</td><td>疑似身份合并</td><td>年均 &gt; 40</td></tr>
+<tr><td>Yuchao Dai</td><td>起始年异常</td><td>最早记录 1984 年</td></tr>
+<tr><td>Yang Yu</td><td>起始年异常</td><td>最早记录 1900 年，跨度 126 年</td></tr>
+<tr><td>Yao Yao</td><td>起始年异常</td><td>最早记录 1987 年</td></tr>
+<tr><td>Minghan Li</td><td>碎片 ID</td><td>仅匹配到 1 篇</td></tr>
+</table>
+<p class="small">另有 3 人未完成消歧：Zhen Liu（港中大深圳，疑似账号未合并）、
+Lv Sheng（北航，检索结果全为重名）、Li Yuan（北大，候选中无该校记录）。</p>
+
+<h3>7.2 复现</h3>
+<ul class="small">
+<li><code>works/*.json</code>　逐作者原始作品（OpenAlex，2026-11-11 快照）</li>
+<li><code>analyze.py</code>　去重 → 标记 → 指标 → 出图，一次运行全部重算</li>
+<li><code>output/author_metrics.csv</code>　逐人指标（含 quadrant 与 flag 列）</li>
+<li><code>output/headline.json</code>　报告中所有分位数与剔除名单</li>
+</ul>
+<p class="small">所有数字均由上述文件计算得出，未做任何手工调整。</p>
+
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>「慢科研」指标设计说明</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm 12mm 13mm; }
+  body { font-family:"Microsoft YaHei","Segoe UI",sans-serif; color:#231a12;
+         font-size:9.2pt; line-height:1.62; margin:0; }
+  h1 { font-size:15pt; margin:0 0 2px; }
+  h2 { font-size:10.8pt; margin:11px 0 4px; color:#6b5429;
+       border-bottom:1.2px solid #d9a24a; padding-bottom:2px; }
+  .meta { color:#7a6a55; font-size:8.2pt; margin-bottom:8px; }
+  table { border-collapse:collapse; width:100%; font-size:8.2pt; margin:5px 0 7px; }
+  th,td { border:1px solid #ddd2bd; padding:3px 5px; vertical-align:top; }
+  th { background:#f3ead8; font-weight:600; }
+  td.num, th.num { text-align:right; }
+  .lead { background:#faf5ea; border-left:3px solid #d9a24a; padding:6px 9px; margin:6px 0; }
+  ol,ul { margin:4px 0 6px; padding-left:17px; }
+  li { margin:2px 0; }
+  code { background:#f4efe4; padding:0 3px; border-radius:2px; font-family:Consolas,monospace; font-size:8pt; }
+  .small { font-size:8pt; color:#5c5040; }
+  b.hl { color:#8a6a2c; }
+  .two { display:flex; gap:8px; }
+  .two > div { flex:1; }
+  .kpi { font-size:8.4pt; border:1px solid #e2d6bd; background:#fcf8f0; border-radius:4px; padding:4px 7px; margin:4px 0; }
+</style>
+</head>
+<body>
+
+<h1>「慢科研」指标设计说明</h1>
+<div class="meta">第 15 组（ML26-15）· 提交者 @3217432735 · 统计方法与机器学习 2026 秋 · 数据快照 2026-11-11<br>
+完整分析见同目录 <code>report_full.pdf</code>（7 页，含全部图表与附录），代码见 <code>code/</code>。</div>
+
+<h2>1　「慢」的定义：不是发得少</h2>
+<p>先做了最直观的那版指标——<b>篇间隔中位数</b>，结果给 0.03 年（约 11 天）。不是算错，是它测的东西不对：
+一年发 20 篇，间隔当然以天计。<b>间隔衡量密度，不衡量深度</b>，弃用。</p>
+<div class="lead">
+本实验把「慢」操作化为一个二维位置，而不是一个刻度：<br>
+<b class="hl">专注度 S</b>＝相邻两个有产出年份的 top3 研究主题集合的 Jaccard 相似度均值（注意力是否长期落在同一处）<br>
+<b class="hl">速度 V</b>＝近五年（2021-11 至快照日）年均发表篇数（当前输出强度）<br>
+「慢」＝<b>S 高且 V 低</b>；但 S、V 都要报，因为只满足一半的人是另外两类人，不能被叫作慢。
+</div>
+<p>为什么不合成一个加权「慢度指数」：权重没有外部依据，换个权重排名就变。二维象限不假装知道该给专注多少权重，
+只给出每个人落在哪个角落。</p>
+
+<h2>2　四个指标的口径与已知缺陷</h2>
+<table>
+<tr><th style="width:14%">指标</th><th style="width:30%">计算口径</th><th>选择理由与它会怎么骗人</th></tr>
+<tr><td><b>S 专注度</b></td>
+<td>按年聚合每人当年全部论文的 OpenAlex 主题，取频次 top3；对相邻年份算 Jaccard，取均值（跨 4 年以上断档不计）</td>
+<td>最贴「慢」的本义：长期啃同一个问题。缺陷：OpenAlex 主题是自动打标的三级标签，噪声大；换到邻近子领域会被记成「换赛道」。</td></tr>
+<tr><td><b>V 速度</b></td>
+<td>近五年窗口内篇数 ÷ 5</td>
+<td>直观、可核。缺陷：跨领域不可比（高能物理一年署名上百篇是常态）；2026 只到 11 月，故用滚动窗口而非年度比较。</td></tr>
+<tr><td><b>团队规模</b></td>
+<td>每篇合作者人数（含本人）的中位数；独作占比</td>
+<td>小团队／独作意味着更长的人均投入，作为「深度」的旁证。缺陷：学科惯例差异极大，CS 会议 5–7 人属常态。</td></tr>
+<tr><td><b>节奏</b></td>
+<td>活跃区间内最长连续无产出年数；逐年篇数的变异系数 CV</td>
+<td>养长项目的痕迹：年粒度空窗＋低 CV＝匀速深耕。缺陷：空窗也可能是离开学术、生病、转岗。</td></tr>
+</table>
+
+<h2>3　数据与清洗</h2>
+<p>链路：GAP Lab 签署页（中英双语两表交叉核对 120 人）→ OpenAlex 作者消歧（姓名＋单位＋方向三路比对）→
+逐作者抓取 works（标题、日期、主题、合作者、被引）。<b>每一步都留了中间文件</b>，见 <code>data/</code>。</p>
+<table>
+<tr><th>阶段</th><th class="num">作者数</th><th class="num">作品数</th><th>处理</th></tr>
+<tr><td>签署名单</td><td class="num">120</td><td class="num">—</td><td>中英两表核对为同一批人</td></tr>
+<tr><td>消歧成功</td><td class="num">117</td><td class="num">33,347</td><td>3 人未解决（见完整报告附录）</td></tr>
+<tr><td>标题去重</td><td class="num">117</td><td class="num">32,652</td><td>归一化标题（小写、去标点、并空格）后保留最早日期，消除预印本/会议/期刊三版重复</td></tr>
+<tr><td><b>进入计算</b></td><td class="num"><b>109</b></td><td class="num"><b>22,108</b></td><td>标记剔除 8 人，汇总时排除</td></tr>
+</table>
+<p class="small"><b>剔除规则（标记而非删除，全部列在附录）：</b>总量 &gt; 1500 篇或年均 &gt; 40 篇 → 疑似同名合并
+（<code>Yue Wang</code> 名下 5,652 篇、1991–2026；<code>Min Yang</code> 2,743 篇）；
+最早记录早于 1990 年 → 起始年异常（<code>Yang Yu</code> 1900 年、跨度 126 年）；
+仅 1 篇 → 碎片 ID（<code>Minghan Li</code>）。<code>Dong Du</code> 团队中位 100 人属高能物理合法形态，仍排除以保持口径一致。</p>
+
+<h2>4　结果：他们到底有多「慢」</h2>
+<div class="kpi">
+中位 <b>154</b> 篇／人　·　近五年中位 <b>18.2</b> 篇/年（四分位 11.0–28.0）　·
+专注度中位 <b>0.37</b>　·　每篇合作者中位 <b>6</b> 人（独作中位仅 1%）　·
+学术跨度中位 <b>19.1</b> 年　·　最长空窗中位 <b>1</b> 年
+</div>
+<p><b>四象限分布</b>（以两维中位数切分）：深耕快产 32 人、广撒慢产 31 人、<b>深耕慢产 23 人</b>、广撒快产 23 人。
+所谓「慢」在这批人里是一个角落，不是主流形态。</p>
+<p><b>两条反直觉的观察：</b></p>
+<ol>
+<li><b>产出少的人并不更专注。</b>年均 &lt;5 篇的 9 人，专注度中位 0.167，低于年均 ≥30 篇那组的 0.392，被引中位也更低（5.5 vs 13）。
+更像是「离开了」而不是「沉下去了」——用「发文少」识别慢科研，抓到的多半是别的东西。</li>
+<li><b>专注与高产不冲突。</b>专注度 ≥0.5 的 28 人，近五年年均中位 19.6 篇，与整体 18.2 几乎相同；个别作者同时站在两维高位。
+这支持把「慢」理解为「在少数方向上反复深挖」，而非「发文频率低」。</li>
+</ol>
+<p class="small"><b>稳健性：</b>剔除产出最高的 5／10／20 人后，近五年年均中位数分别为 17.6／17.2／15.0 篇/年，结论方向不变。
+（作者消歧的错误几乎总是「多并少」，若结论只在含极端值时成立，那它就是误差造出来的。）</p>
+
+<div class="two">
+  <div style="flex:1.15">
+    <table>
+    <tr><th>指标（109 人）</th><th class="num">P25</th><th class="num">中位</th><th class="num">P75</th><th class="num">P90</th></tr>
+    <tr><td>总篇数</td><td class="num">98</td><td class="num">154</td><td class="num">257</td><td class="num">398</td></tr>
+    <tr><td>近五年篇/年</td><td class="num">11.0</td><td class="num">18.2</td><td class="num">28.0</td><td class="num">39.2</td></tr>
+    <tr><td>专注度 S</td><td class="num">0.27</td><td class="num">0.37</td><td class="num">0.51</td><td class="num">0.58</td></tr>
+    <tr><td>每篇合作者</td><td class="num">5.0</td><td class="num">6.0</td><td class="num">7.0</td><td class="num">7.5</td></tr>
+    <tr><td>最长空窗（年）</td><td class="num">0</td><td class="num">1</td><td class="num">2</td><td class="num">7</td></tr>
+    <tr><td>年度 CV</td><td class="num">0.73</td><td class="num">0.83</td><td class="num">0.95</td><td class="num">1.03</td></tr>
+    <tr><td>单篇被引中位</td><td class="num">10</td><td class="num">14</td><td class="num">19</td><td class="num">28</td></tr>
+    </table>
+    <p class="small" style="margin-top:-2px">分位数由 <code>data/headline.json</code> 给出，可逐项复算。</p>
+  </div>
+  <div style="flex:1">
+    <img src="fig2_quadrant.png" style="width:100%;border:1px solid #e8dfcd" alt="四象限">
+    <p class="small" style="margin:3px 0 0">图：专注 × 速度。虚线为两维中位数；右上 32 人、左上 23 人、
+    左下 31 人、右下 23 人。</p>
+  </div>
+</div>
+
+<h2>5　这个指标不能回答什么</h2>
+<ol>
+<li><b>因果。</b>是签了声明才变慢，还是本来就慢的人更愿意签？本实验的数据是同一时点的截面，
+<b>回答不了方向</b>；要回答它需要签署前后的面板数据和可比的对照组。</li>
+<li><b>价值判断。</b>只描述形态，不评价好坏。高产不等于浮躁，低产不等于深刻。</li>
+<li><b>领域可比性。</b>样本以 CS/AI 为主但仍跨方向，未做领域归一；绝对篇数不可跨领域比较。</li>
+<li><b>身份完整性。</b>117/120 是消歧结果而非真值，个体结论应视为「在该数据版本下成立」。</li>
+</ol>
+<p class="small">数据与引用均来自 GAP Lab 签署页与 OpenAlex 公开 API，可追溯、未编造；文中「数据事实」与「我的解读」已分行标注。</p>
+
+</body>
+</html>

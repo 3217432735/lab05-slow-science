@@ -1,0 +1,439 @@
+{
+ "_meta": {
+  "n_signatory": 109,
+  "n_control": 292,
+  "control_dropped": [
+   {
+    "name": "Howard S. Hock",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "D.A. Karras",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Ettore Stella",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Hiroyuki Ochiai",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Naftali Tishby",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Kazuhito Sato",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "正之 中嶋",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "William Johnston",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Frank Van Reeth",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "G. Roberti",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "N. M. Kwok",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Hiroshi Nakagawa",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "S. Pallotta",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Edward H. Adelson",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Kokou Yétongnon",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Peter Christen",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Sarah V. Stevenage",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Martin David Adams",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Soon‐Bum Lim",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Tohru SASAKI",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "John P. Oakley",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Seiji Ishikawa",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Ahmad H. Nasri",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Ashwin Ram",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Joonwhoan Lee",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Bruce Bridgeman",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Edward M. Riseman",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Yoichi Sato",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Ken Y. Goldberg",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Wendy Sandler",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Christopher G. Atkeson",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Dinesh K. Pai",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Richard W. Conners",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Po-Yao Huang",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Yu. I. Zhuravlev",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Jan Struyf",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Geneviève Pinçon",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Jian Cun Zhao",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Alex Chichung Kot",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Scott J. Daly",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Matthias Göggerle",
+    "flag": "疑似身份合并"
+   },
+   {
+    "name": "Reinhard Klette",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Tomoaki Kimura",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Karen A. Vineberg",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "giravolt",
+    "flag": "疑似身份合并"
+   },
+   {
+    "name": "Xiaotong Wang",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Jianfei Cai",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Ying Fu",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Satoshi Goto",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Minghu Jiang",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Guang Chen",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Allan D. Jepson",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Michael S. Lew",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Christoph Zenger",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "John W. Woods",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "J.P. Jones",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Keith M. Sullivan",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "B. Roy Frieden",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "L.S. Davis",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Tatsuro Chiba",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Kaoru Arakawa",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Randall Davis",
+    "flag": "起始年异常"
+   },
+   {
+    "name": "Hadyn D. Ellis",
+    "flag": "起始年异常"
+   }
+  ],
+  "control_sample": "同主题（签署者高频主题 top30）、篇数 80–700 的随机作者，排除签署者本人"
+ },
+ "topic_stability": {
+  "label": "专注度 S",
+  "signatory_median": 0.373,
+  "control_median": 0.265,
+  "diff": 0.108,
+  "ci95": [
+   0.065,
+   0.169
+  ],
+  "p": 0.0,
+  "n_signatory": 109,
+  "n_control": 292
+ },
+ "recent5_per_year": {
+  "label": "近五年篇/年",
+  "signatory_median": 18.2,
+  "control_median": 8.3,
+  "diff": 9.9,
+  "ci95": [
+   6.6,
+   12.2
+  ],
+  "p": 0.0,
+  "n_signatory": 109,
+  "n_control": 292
+ },
+ "pace_per_year": {
+  "label": "全程篇/年",
+  "signatory_median": 8.57,
+  "control_median": 5.36,
+  "diff": 3.21,
+  "ci95": [
+   2.005,
+   5.845
+  ],
+  "p": 0.0,
+  "n_signatory": 109,
+  "n_control": 292
+ },
+ "team_median": {
+  "label": "团队规模中位",
+  "signatory_median": 6.0,
+  "control_median": 4.0,
+  "diff": 2.0,
+  "ci95": [
+   2.0,
+   2.0
+  ],
+  "p": 0.0,
+  "n_signatory": 109,
+  "n_control": 292
+ },
+ "solo_share": {
+  "label": "独作占比",
+  "signatory_median": 0.01,
+  "control_median": 0.022,
+  "diff": -0.012,
+  "ci95": [
+   -0.016,
+   -0.007
+  ],
+  "p": 0.0,
+  "n_signatory": 109,
+  "n_control": 292
+ },
+ "max_gap_years": {
+  "label": "最长空窗(年)",
+  "signatory_median": 1.0,
+  "control_median": 1.0,
+  "diff": 0.0,
+  "ci95": [
+   0.0,
+   0.0
+  ],
+  "p": 0.0748,
+  "n_signatory": 109,
+  "n_control": 292
+ },
+ "cv_yearly": {
+  "label": "年度 CV",
+  "signatory_median": 0.829,
+  "control_median": 0.714,
+  "diff": 0.115,
+  "ci95": [
+   0.068,
+   0.164
+  ],
+  "p": 0.0,
+  "n_signatory": 109,
+  "n_control": 291
+ },
+ "cite_median": {
+  "label": "单篇被引中位",
+  "signatory_median": 14.0,
+  "control_median": 5.0,
+  "diff": 9.0,
+  "ci95": [
+   8.0,
+   11.75
+  ],
+  "p": 0.0,
+  "n_signatory": 109,
+  "n_control": 292
+ },
+ "n_uniq": {
+  "label": "总篇数",
+  "signatory_median": 154.0,
+  "control_median": 116.5,
+  "diff": 37.5,
+  "ci95": [
+   9.0,
+   70.0
+  ],
+  "p": 0.0019,
+  "n_signatory": 109,
+  "n_control": 292
+ },
+ "span_years": {
+  "label": "学术跨度(年)",
+  "signatory_median": 19.1,
+  "control_median": 23.8,
+  "diff": -4.7,
+  "ci95": [
+   -7.0,
+   -3.0
+  ],
+  "p": 0.0,
+  "n_signatory": 109,
+  "n_control": 292
+ },
+ "_matched": {
+  "window": [
+   15.0,
+   25.0
+  ],
+  "n_signatory": 56,
+  "n_control": 139,
+  "topic_stability": {
+   "label": "专注度 S",
+   "signatory_median": 0.361,
+   "control_median": 0.267,
+   "diff": 0.094,
+   "n_signatory": 56,
+   "n_control": 139
+  },
+  "recent5_per_year": {
+   "label": "近五年篇/年",
+   "signatory_median": 18.9,
+   "control_median": 8.4,
+   "diff": 10.5,
+   "n_signatory": 56,
+   "n_control": 139
+  },
+  "team_median": {
+   "label": "团队规模中位",
+   "signatory_median": 6.0,
+   "control_median": 4.0,
+   "diff": 2.0,
+   "n_signatory": 56,
+   "n_control": 139
+  },
+  "cite_median": {
+   "label": "单篇被引中位",
+   "signatory_median": 14.0,
+   "control_median": 5.0,
+   "diff": 9.0,
+   "n_signatory": 56,
+   "n_control": 139
+  },
+  "n_uniq": {
+   "label": "总篇数",
+   "signatory_median": 170.0,
+   "control_median": 113.0,
+   "diff": 57.0,
+   "n_signatory": 56,
+   "n_control": 139
+  }
+ }
+}
